@@ -1,0 +1,35 @@
+rules_version = '2';
+// Regras do banco de pedidos da Dianê (Firebase → Firestore → Regras).
+// Clientes (sem login) só podem CRIAR um pedido novo e ver o próprio pedido pelo id.
+// A equipe (login de e-mail e senha) vê todos, muda o status e registra vendas do balcão.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /pedidos/{id} {
+      function pedidoValido(d) {
+        return d.keys().hasOnly(['codigo','criadoEm','canal','mesa','nome','telefone','local','quando','pagamento','obs','itens','subtotal','frete','bairro','total','status','em_entregue'])
+          && d.canal in ['mesa','retirada','entrega','balcao']
+          && d.itens is list && d.itens.size() > 0 && d.itens.size() <= 40
+          && d.total is number && d.total > 0 && d.total < 3000
+          && d.nome is string && d.nome.size() <= 60
+          && d.obs is string && d.obs.size() <= 300
+          && d.local is string && d.local.size() <= 200
+          && (!('frete' in d) || (d.frete is number && d.frete >= 0 && d.frete <= 30))
+          && (!('bairro' in d) || (d.bairro is string && d.bairro.size() <= 40))
+          && d.codigo is string && d.codigo.size() <= 6;
+      }
+      // cliente: só pedido novo, feito pelo site, com a hora do servidor
+      allow create: if pedidoValido(request.resource.data)
+        && request.resource.data.criadoEm == request.time
+        && ((request.resource.data.status == 'novo' && request.resource.data.canal != 'balcao')
+            || request.auth != null);
+      // qualquer um com o id (que é aleatório) acompanha o próprio pedido
+      allow get: if true;
+      // só a equipe lista os pedidos e muda o status
+      allow list: if request.auth != null;
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','em_preparo','em_pronto','em_entregue','em_cancelado'])
+        && request.resource.data.status in ['novo','preparo','pronto','entregue','cancelado'];
+      allow delete: if false;
+    }
+  }
+}

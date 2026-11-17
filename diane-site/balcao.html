@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dianê · Balcão</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#3D2116">
+<link rel="icon" href="midia/diane-simbolo-caramelo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,600..900,0..100,0..1&family=Jost:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --torra:#3D2116; --caramelo:#A4560D; --avela:#C99B72; --leite:#FFE7D0; --creme:#FFF6EC; --areia:#F2CDB0;
+  --texto:#3B2416; --suave:#6B5444; --linha:#E3D5C4;
+  --novo:#C8461F; --novo-bg:#FBE5DC; --preparo:#A4560D; --pronto:#2F7D4F; --pronto-bg:#E3F2E8; --azul:#2F5F8A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{overflow-x:hidden;font-family:Jost,Arial,sans-serif;background:var(--leite);color:var(--texto);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font:inherit;color:inherit}
+.esconde{display:none!important}
+
+/* topo */
+.topo{position:sticky;top:0;z-index:20;background:var(--torra);color:#fff;padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));padding-top:env(safe-area-inset-top)}
+.topo .lin1{display:flex;align-items:center;gap:14px;height:60px}
+.marca{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
+.marca img{width:24px;height:29px}
+.marca small{font-weight:600;font-size:13px;color:var(--areia);margin-left:4px}
+.abas{display:flex;gap:4px;margin-left:12px}
+.abas button{padding:9px 14px;border-radius:999px;font-weight:700;font-size:14px;color:var(--areia)}
+.abas button[aria-selected=true]{background:#fff;color:var(--torra)}
+.abas .n{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:var(--novo);color:#fff;font-size:11px;margin-left:6px;padding:0 5px}
+.dir{margin-left:auto;display:flex;align-items:center;gap:10px}
+.conexao{font-size:12px;font-weight:600;color:var(--areia);display:flex;align-items:center;gap:6px}
+.conexao::before{content:"";width:8px;height:8px;border-radius:50%;background:#7BD39A}
+.conexao.off::before{background:#E8A48A}
+.btn-som{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-size:13px;font-weight:700}
+.btn-som svg{width:16px;height:16px}
+.btn-som.mudo{background:var(--novo)}
+@media (max-width:760px){
+  .topo .lin1{flex-wrap:wrap;height:auto;padding:10px 0;row-gap:10px}
+  .abas{order:3;margin-left:0;width:100%;overflow-x:auto}
+  .abas button{flex:1;white-space:nowrap}
+  .conexao span{display:none}
+}
+.demo{background:#FFF4D6;color:#6B4B00;font-size:13px;font-weight:600;padding:10px max(16px,env(safe-area-inset-left));text-align:center}
+
+main{padding:20px max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left));max-width:1500px;margin:0 auto}
+
+/* filtros */
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+.chip{padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--linha);font-size:13px;font-weight:700;color:var(--suave)}
+.chip[aria-pressed=true]{background:var(--torra);border-color:var(--torra);color:#fff}
+.resumo-dia{margin-left:auto;font-size:13px;color:var(--suave);font-weight:600}
+
+/* quadro */
+.seg{display:none;gap:6px;margin-bottom:14px;background:#fff;padding:5px;border-radius:999px}
+.seg button{flex:1;padding:10px;border-radius:999px;font-weight:700;font-size:13.5px;color:var(--suave)}
+.seg button[aria-selected=true]{background:var(--torra);color:#fff}
+.quadro{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.coluna{background:rgba(255,255,255,.55);border-radius:20px;padding:12px;min-height:200px}
+.coluna h2{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--torra);padding:6px 6px 12px}
+.coluna h2 .n{background:var(--torra);color:#fff;border-radius:999px;font-size:12px;min-width:24px;height:24px;display:grid;place-items:center;padding:0 6px}
+.coluna[data-s=novo] h2{color:var(--novo)} .coluna[data-s=novo] h2 .n{background:var(--novo)}
+.coluna[data-s=pronto] h2{color:var(--pronto)} .coluna[data-s=pronto] h2 .n{background:var(--pronto)}
+.cartoes{display:grid;gap:12px}
+.vazio-col{font-size:13.5px;color:#A8978A;text-align:center;padding:28px 10px}
+@media (max-width:900px){.seg{display:flex}.quadro{grid-template-columns:1fr}.coluna:not(.ativa){display:none}}
+
+.cartao{background:#fff;border-radius:18px;padding:16px;display:grid;gap:10px;box-shadow:0 4px 14px rgba(89,47,26,.08);border-left:6px solid var(--preparo)}
+.cartao[data-s=novo]{border-color:var(--novo);animation:pulsa 1.6s ease-in-out infinite}
+.cartao[data-s=pronto]{border-color:var(--pronto)}
+@keyframes pulsa{50%{box-shadow:0 0 0 6px rgba(200,70,31,.18)}}
+@media (prefers-reduced-motion:reduce){.cartao[data-s=novo]{animation:none}}
+.c-topo{display:flex;align-items:flex-start;gap:10px}
+.cod{font-size:26px;font-weight:800;color:var(--torra);letter-spacing:.02em;line-height:1}
+.canal{display:inline-block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:5px 9px;border-radius:8px;background:var(--leite);color:var(--torra);margin-top:6px}
+.canal.mesa{background:var(--torra);color:#fff}
+.canal.entrega{background:#E1EBF5;color:var(--azul)}
+.canal.balcao{background:#EEE;color:#555}
+.tempo{margin-left:auto;text-align:right;font-size:12.5px;color:var(--suave);font-weight:600}
+.tempo b{display:block;font-size:18px;color:var(--texto)}
+.tempo.atraso b{color:var(--novo)}
+.quem{font-size:14.5px;font-weight:700}
+.quem a{color:var(--azul);font-weight:600;font-size:13px;margin-left:6px}
+.local{font-size:13.5px;color:var(--azul);font-weight:700}
+.agendado{font-size:13px;font-weight:800;color:#7A4B00;background:#FFF0C9;padding:4px 8px;border-radius:8px;width:max-content}
+.itens{list-style:none;display:grid;gap:4px;font-size:15px;border-top:1px dashed var(--linha);border-bottom:1px dashed var(--linha);padding:8px 0}
+.itens b{display:inline-block;min-width:28px;color:var(--caramelo)}
+.itens small{display:block;margin-left:28px;color:var(--suave);font-size:12.5px}
+.obs{background:#FFF4D6;color:#6B4B00;font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:10px}
+.alerta{background:var(--novo-bg);color:var(--novo);font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:10px}
+.c-rodape{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pag{font-size:13px;color:var(--suave);font-weight:600}
+.valor{font-weight:800;font-size:17px;margin-right:auto}
+.acao{padding:11px 16px;border-radius:12px;font-weight:800;font-size:14px;color:#fff;background:var(--torra)}
+.acao.aceitar{background:var(--novo)}
+.acao.pronto{background:var(--pronto)}
+.acao:active{transform:scale(.97)}
+.cancelar{font-size:12.5px;font-weight:700;color:var(--suave);padding:8px;text-decoration:underline}
+.cancelar.confirma{color:#fff;background:var(--novo);text-decoration:none;border-radius:10px}
+details.entregues{margin-top:20px;background:#fff;border-radius:18px;padding:14px 18px}
+details.entregues summary{font-weight:800;color:var(--torra);cursor:pointer}
+.tabela-simples{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.tabela-simples td{padding:8px 6px;border-top:1px solid var(--linha)}
+.tabela-simples td:last-child{text-align:right;font-weight:700}
+
+/* nova venda */
+.venda{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+@media (max-width:900px){.venda{grid-template-columns:1fr}}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.grade h3{grid-column:1/-1;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--caramelo);margin-top:8px}
+.prod{background:#fff;border-radius:16px;padding:14px;text-align:left;display:grid;gap:4px;border:2px solid transparent;min-height:84px}
+.prod:hover{border-color:var(--areia)}
+.prod:active{transform:scale(.97)}
+.prod b{font-size:14.5px;color:var(--torra)}
+.prod span{font-size:13px;color:var(--caramelo);font-weight:700}
+.sabor-sel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;grid-column:1/-1;font-size:13px;font-weight:700;color:var(--suave)}
+.caixa{background:#fff;border-radius:20px;padding:18px;display:grid;gap:14px;position:sticky;top:80px}
+.caixa h2{font-size:18px;font-weight:800;color:var(--torra)}
+.caixa .lin{display:flex;align-items:center;gap:8px;font-size:14px;padding:6px 0;border-bottom:1px solid var(--linha)}
+.caixa .lin span:first-child{flex:1}
+.mini{display:inline-flex;align-items:center;background:var(--leite);border-radius:999px}
+.mini button{width:30px;height:30px;border-radius:50%;font-weight:800;color:var(--torra)}
+.mini span{min-width:22px;text-align:center;font-weight:800}
+.campo{display:grid;gap:6px;font-size:13px;font-weight:700;color:var(--torra)}
+.campo input{padding:12px;border-radius:12px;border:1px solid var(--linha);font-size:15px}
+.total-caixa{display:flex;justify-content:space-between;align-items:baseline;font-size:15px}
+.total-caixa b{font-size:26px;color:var(--torra)}
+.btn-grande{width:100%;padding:16px;border-radius:14px;background:var(--caramelo);color:#fff;font-weight:800;font-size:16px}
+.btn-grande:disabled{opacity:.45;cursor:not-allowed}
+
+/* resultado */
+.periodos{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+@media (max-width:900px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:#fff;border-radius:18px;padding:18px}
+.kpi span{font-size:12.5px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.06em}
+.kpi b{display:block;font-size:28px;font-weight:800;color:var(--torra);margin-top:6px}
+.kpi small{font-size:12.5px;color:var(--suave)}
+.kpi.destaque{background:var(--torra)} .kpi.destaque span,.kpi.destaque small{color:var(--areia)} .kpi.destaque b{color:#fff}
+.kpi.neg b{color:#F2A58C}
+.blocos{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+@media (max-width:1000px){.blocos{grid-template-columns:1fr}}
+.bloco{background:#fff;border-radius:18px;padding:20px;min-width:0}
+.bloco h2{font-size:15px;font-weight:800;color:var(--torra);margin-bottom:12px}
+.bloco p.nota{font-size:12.5px;color:var(--suave);margin-top:10px}
+.dre{width:100%;border-collapse:collapse;font-size:14px}
+.dre td{padding:9px 4px;border-bottom:1px solid var(--linha)}
+.dre td:nth-child(2){text-align:right;white-space:nowrap}
+.dre td:nth-child(3){text-align:right;color:var(--suave);font-size:12.5px;width:60px}
+.dre tr.sub td{font-weight:800;color:var(--torra);background:var(--creme)}
+.dre tr.menos td:first-child{padding-left:18px;color:var(--suave)}
+.dre tr.fim td{font-weight:800;font-size:16px;color:#fff;background:var(--torra)}
+.dre tr.fim.neg td{background:var(--novo)}
+.barra-eq{height:14px;background:var(--leite);border-radius:999px;overflow:hidden;margin:10px 0 6px}
+.barra-eq div{height:100%;background:var(--pronto);border-radius:999px;transition:width .4s}
+.horas{display:flex;align-items:flex-end;gap:6px;height:150px;padding-top:18px}
+.horas div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;min-width:0}
+.horas i{display:block;width:100%;background:var(--caramelo);border-radius:6px 6px 0 0;min-height:2px}
+.horas small{font-size:11px;color:var(--suave)}
+.horas em{font-size:10.5px;font-style:normal;color:var(--torra);font-weight:700}
+.rank{display:grid;gap:8px}
+.rank div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;font-size:13.5px}
+.rank i{grid-column:1/-1;height:8px;border-radius:999px;background:var(--leite);overflow:hidden}
+.rank i u{display:block;height:100%;background:var(--avela)}
+.rank b{text-align:right}
+
+/* sobreposições */
+.capa{position:fixed;inset:0;z-index:50;background:var(--torra);color:#fff;display:grid;place-items:center;padding:24px}
+.capa .caixa-capa{width:min(420px,100%);display:grid;gap:16px;text-align:center}
+.capa img{width:110px;margin:0 auto 6px}
+.capa h1{font-size:26px;font-weight:800}
+.capa p{color:var(--areia);font-size:15px}
+.capa input{width:100%;padding:14px;border-radius:12px;border:0;font-size:16px;color:var(--texto)}
+.capa .btn-grande{background:var(--caramelo)}
+.capa .erro{color:#F2A58C;font-size:13.5px;font-weight:600}
+.toast{max-width:calc(100% - 32px);text-align:center;position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--torra);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:60;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<!-- 1. entrar (só com Firebase) -->
+<div class="capa esconde" id="capa-login">
+  <form class="caixa-capa" id="form-login">
+    <img src="midia/diane-logo-creme.svg" alt="Dianê">
+    <h1>Painel do balcão</h1>
+    <p>Entre com o e-mail da equipe.</p>
+    <input id="l-email" type="email" autocomplete="username" placeholder="E-mail" required>
+    <input id="l-senha" type="password" autocomplete="current-password" placeholder="Senha" required>
+    <p class="erro esconde" id="l-erro"></p>
+    <button class="btn-grande" type="submit">Entrar</button>
+  </form>
+</div>
+
+<!-- 2. abrir o balcão (libera som, notificação e tela acesa) -->
+<div class="capa esconde" id="capa-abrir">
+  <div class="caixa-capa">
+    <img src="midia/diane-logo-creme.svg" alt="Dianê">
+    <h1>Bom dia, equipe</h1>
+    <p>Toque para abrir o balcão. Assim o som de novo pedido e as notificações ficam ligados, e a tela não apaga.</p>
+    <button class="btn-grande" id="btn-abrir" type="button">Abrir o balcão</button>
+  </div>
+</div>
+
+<header class="topo">
+  <div class="lin1">
+    <div class="marca"><img src="midia/diane-nome-creme.svg" alt="Dianê" style="width:auto;height:26px"><small>balcão</small></div>
+    <nav class="abas" role="tablist">
+      <button role="tab" aria-selected="true" data-vista="pedidos">Pedidos<span class="n esconde" id="n-novos">0</span></button>
+      <button role="tab" aria-selected="false" data-vista="venda">Venda no balcão</button>
+      <button role="tab" aria-selected="false" data-vista="resultado" id="aba-resultado">Resultado</button>
+    </nav>
+    <div class="dir">
+      <a href="mesas.html" target="_blank" rel="noopener" style="color:var(--areia);font-size:13px;font-weight:600">QR Codes</a>
+      <span class="conexao" id="conexao"><span>Conectado</span></span>
+      <button class="btn-som" id="btn-som" type="button" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        <span>Som ligado</span>
+      </button>
+    </div>
+  </div>
+</header>
+<div class="demo esconde" id="aviso-demo">Modo demonstração: os pedidos só aparecem aqui se forem feitos neste mesmo navegador. Para usar na loja, conecte o Firebase no arquivo cardapio.js.</div>
+
+<main>
+  <!-- PEDIDOS -->
+  <section id="v-pedidos">
+    <div class="filtros" id="filtros">
+      <button class="chip" aria-pressed="true" data-f="todos">Todos</button>
+            <button class="chip" aria-pressed="false" data-f="retirada">Retirada</button>
+      <button class="chip" aria-pressed="false" data-f="entrega">Entrega</button>
+      <span class="resumo-dia" id="resumo-dia"></span>
+    </div>
+    <div class="seg" role="tablist" id="seg"></div>
+    <div class="quadro" id="quadro">
+      <div class="coluna ativa" data-s="novo"><h2>Novos <span class="n">0</span></h2><div class="cartoes"></div></div>
+      <div class="coluna" data-s="preparo"><h2>Em preparo <span class="n">0</span></h2><div class="cartoes"></div></div>
+      <div class="coluna" data-s="pronto"><h2>Prontos <span class="n">0</span></h2><div class="cartoes"></div></div>
+    </div>
+    <details class="entregues"><summary id="sum-entregues">Entregues e cancelados hoje</summary><table class="tabela-simples" id="tab-entregues"></table></details>
+  </section>
+
+  <!-- VENDA NO BALCÃO -->
+  <section id="v-venda" class="esconde">
+    <div class="venda">
+      <div class="grade" id="grade"></div>
+      <aside class="caixa">
+        <h2>Venda no balcão</h2>
+        <div id="caixa-linhas"><p style="color:var(--suave);font-size:14px">Toque nos produtos para lançar a venda.</p></div>
+        <label class="campo">Nome do cliente (opcional)<input id="v-nome" maxlength="60"></label>
+        <div class="campo">Pagamento
+          <div class="filtros" id="v-pag" style="margin:0">
+            <button class="chip" aria-pressed="true" data-v="Pix">Pix</button>
+            <button class="chip" aria-pressed="false" data-v="Cartão">Cartão</button>
+            <button class="chip" aria-pressed="false" data-v="Dinheiro">Dinheiro</button>
+          </div>
+        </div>
+        <div class="total-caixa"><span>Total</span><b id="v-total">R$ 0,00</b></div>
+        <button class="btn-grande" id="v-registrar" disabled>Registrar venda</button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="v-resultado" class="esconde">
+    <div class="periodos" id="periodos">
+      <button class="chip" aria-pressed="true" data-p="hoje">Hoje</button>
+      <button class="chip" aria-pressed="false" data-p="7d">Últimos 7 dias</button>
+      <button class="chip" aria-pressed="false" data-p="mes">Este mês</button>
+      <span class="resumo-dia" id="atualizado">Atualiza sozinho a cada venda</span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="blocos">
+      <div class="bloco">
+        <h2>DRE do período</h2>
+        <table class="dre" id="dre"></table>
+        <p class="nota" id="nota-dre"></p>
+      </div>
+      <div style="display:grid;gap:16px;min-width:0">
+        <div class="bloco"><h2 id="eq-titulo">Ponto de equilíbrio</h2><div id="eq"></div></div>
+        <div class="bloco"><h2>Vendas por hora</h2><div class="horas" id="horas"></div></div>
+        <div class="bloco"><h2>O que mais vende</h2><div class="rank" id="rank"></div></div>
+        <div class="bloco"><h2>Por canal e pagamento</h2><div class="rank" id="canais"></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="cardapio.js"></script>
+<script src="pedidos.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const brl = v => (v || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const pct = v => isFinite(v) ? (v * 100).toLocaleString('pt-BR', {maximumFractionDigits:1}) + '%' : '–';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hora = ms => new Date(ms).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+let api, todos = [], vista = 'pedidos', filtro = 'todos', colMovel = 'novo', periodo = 'hoje';
+let somLigado = true, vistos = null, wakeLock = null;
+
+function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
+const inicioDia = (d = new Date()) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+
+/* ================= alertas ================= */
+let audio;
+function tocar(){
+  if (!somLigado) return;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = audio.currentTime;
+    [[880,0],[1318.5,.18],[880,.5],[1318.5,.68]].forEach(([f, d]) => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t0 + d); g.gain.linearRampToValueAtTime(.35, t0 + d + .02); g.gain.exponentialRampToValueAtTime(.001, t0 + d + .4);
+      o.connect(g).connect(audio.destination); o.start(t0 + d); o.stop(t0 + d + .45);
+    });
+  } catch(e) {}
+  try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e) {}
+}
+function notificar(p){
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const onde = p.canal === 'mesa' ? `Mesa ${p.mesa}` : p.canal === 'entrega' ? 'Entrega' : 'Retirada';
+      new Notification(`Novo pedido ${p.codigo} · ${onde}`, {body: `${p.nome} · ${p.itens.reduce((s,i)=>s+i.q,0)} itens · ${brl(p.total)}`, icon:'midia/diane-simbolo-caramelo.svg', tag:p.id});
+    }
+  } catch(e) {}
+}
+setInterval(() => { if (todos.some(p => p.status === 'novo' && p.criadoEm >= +inicioDia())) tocar(); }, 25000);
+let piscar = false;
+setInterval(() => {
+  const n = hoje().filter(p => p.status === 'novo').length;
+  piscar = !piscar;
+  document.title = n ? (piscar ? `(${n}) Novo pedido` : 'Dianê · Balcão') : 'Dianê · Balcão';
+}, 1200);
+async function telaAcesa(){ try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && wakeLock !== null) telaAcesa(); });
+$('#btn-som').onclick = () => {
+  somLigado = !somLigado;
+  const b = $('#btn-som'); b.classList.toggle('mudo', !somLigado); b.setAttribute('aria-pressed', somLigado);
+  b.querySelector('span').textContent = somLigado ? 'Som ligado' : 'Som desligado';
+  if (somLigado) tocar();
+};
+
+/* ================= dados ================= */
+const hoje = () => todos.filter(p => p.criadoEm >= +inicioDia());
+function aoMudar(lista){
+  const antes = vistos;
+  vistos = new Set(lista.map(p => p.id));
+  if (antes) lista.filter(p => !antes.has(p.id) && p.status === 'novo').forEach(p => { tocar(); notificar(p); toast(`Novo pedido ${p.codigo}`); });
+  todos = lista;
+  $('#conexao').classList.remove('off'); $('#conexao span').textContent = 'Conectado';
+  render();
+}
+function iniciar(){
+  const d = new Date(); const ini = new Date(d.getFullYear(), d.getMonth(), 1);
+  const sete = inicioDia(new Date(Date.now() - 6 * 864e5));
+  api.ouvirDesde(ini < sete ? ini : sete, aoMudar, () => { $('#conexao').classList.add('off'); $('#conexao span').textContent = 'Sem conexão'; });
+  setInterval(() => vista === 'pedidos' && renderPedidos(), 30000);
+}
+
+/* ================= pedidos ================= */
+const ROTULO = {mesa:'Mesa', retirada:'Retirada', entrega:'Entrega', balcao:'Balcão'};
+function canalHtml(p){
+  if (p.canal === 'mesa') { const m = CONFIG.mesas.find(x => x.n === p.mesa); return `<span class="canal mesa">Mesa ${p.mesa}${m ? ' · ' + esc(m.nome) : ''}</span>`; }
+  return `<span class="canal ${p.canal}">${ROTULO[p.canal] || p.canal}</span>`;
+}
+function cartao(p){
+  const min = Math.floor((Date.now() - p.criadoEm) / 60000);
+  const conf = Catalogo.conferir(p.itens) + (p.frete || 0);
+  const acao = p.status === 'novo' ? `<button class="acao aceitar" data-st="preparo" data-id="${p.id}">Aceitar e preparar</button>`
+    : p.status === 'preparo' ? `<button class="acao pronto" data-st="pronto" data-id="${p.id}">Está pronto</button>`
+    : `<button class="acao" data-st="entregue" data-id="${p.id}">${p.canal === 'mesa' ? 'Entregue na mesa' : 'Entregue'}</button>`;
+  const fone = (p.telefone || '').replace(/\D/g, '');
+  return `<article class="cartao" data-s="${p.status}">
+    <div class="c-topo"><div><div class="cod">${esc(p.codigo)}</div>${canalHtml(p)}</div>
+      <div class="tempo ${min >= 15 && p.status !== 'pronto' ? 'atraso' : ''}"><b>${min < 1 ? 'agora' : min + ' min'}</b>${hora(p.criadoEm)}</div></div>
+    <div class="quem">${esc(p.nome) || 'Sem nome'}${fone ? `<a href="https://wa.me/55${fone.replace(/^55/, '')}" target="_blank" rel="noopener">${esc(p.telefone)}</a>` : ''}</div>
+    ${p.local ? `<div class="local">Entregar em: ${esc(p.local)}</div>` : ''}
+    ${p.canal === 'entrega' ? `<div class="agendado">Taxa de entrega: ${p.frete ? brl(p.frete) : 'grátis'}</div>` : ''}
+    ${p.quando && p.quando !== 'agora' ? `<div class="agendado">Para as ${esc(p.quando)}</div>` : ''}
+    <ul class="itens">${p.itens.map(i => `<li><b>${i.q}x</b>${esc(i.nome)}${i.sabor ? `<small>${esc(i.sabor)}</small>` : ''}</li>`).join('')}</ul>
+    ${p.obs ? `<div class="obs">Obs.: ${esc(p.obs)}</div>` : ''}
+    ${Math.abs(conf - p.total) > 0.01 ? `<div class="alerta">Atenção: pelo cardápio, o total seria ${brl(conf)}.</div>` : ''}
+    <div class="c-rodape"><span class="valor">${brl(p.total)}</span><span class="pag">${esc(p.pagamento)}</span>${acao}
+      <button class="cancelar" data-cancelar="${p.id}">Cancelar</button></div>
+  </article>`;
+}
+function renderPedidos(){
+  const lista = hoje().filter(p => p.canal !== 'balcao' && (filtro === 'todos' || p.canal === filtro));
+  const grupos = {novo:[], preparo:[], pronto:[]};
+  lista.forEach(p => grupos[p.status] && grupos[p.status].push(p));
+  document.querySelectorAll('.coluna').forEach(c => {
+    const s = c.dataset.s, g = grupos[s];
+    c.querySelector('.n').textContent = g.length;
+    c.querySelector('.cartoes').innerHTML = g.length ? g.map(cartao).join('') : `<p class="vazio-col">${s === 'novo' ? 'Nenhum pedido novo. Quando chegar um, toca o alerta.' : 'Nada aqui.'}</p>`;
+    c.classList.toggle('ativa', s === colMovel);
+  });
+  $('#seg').innerHTML = [['novo','Novos'],['preparo','Preparo'],['pronto','Prontos']].map(([s,n]) => `<button role="tab" aria-selected="${s===colMovel}" data-col="${s}">${n} (${grupos[s].length})</button>`).join('');
+  const novos = hoje().filter(p => p.status === 'novo').length;
+  $('#n-novos').textContent = novos; $('#n-novos').classList.toggle('esconde', !novos);
+  const feitos = hoje().filter(p => p.status === 'entregue' || p.status === 'cancelado').reverse();
+  $('#sum-entregues').textContent = `Entregues e cancelados hoje (${feitos.length})`;
+  $('#tab-entregues').innerHTML = feitos.map(p => `<tr><td>${hora(p.criadoEm)}</td><td>${esc(p.codigo)}</td><td>${ROTULO[p.canal]}${p.mesa ? ' ' + p.mesa : ''}</td><td>${esc(p.nome)}</td><td>${p.status === 'cancelado' ? 'Cancelado' : esc(p.pagamento)}</td><td>${brl(p.total)}</td></tr>`).join('') || '<tr><td>Nenhum ainda.</td></tr>';
+  const valido = hoje().filter(p => p.status !== 'cancelado');
+  $('#resumo-dia').textContent = `Hoje: ${valido.length} pedidos · ${brl(valido.reduce((s,p)=>s+p.total,0))}`;
+}
+
+/* ================= venda no balcão ================= */
+let caixa = [], grupoCaixa = 'brigadeiro';
+const saborCaixa = Object.fromEntries(Object.entries(SABORES).map(([g, l]) => [g, l[0]]));
+const grupoDe = i => i.sabores ? (i.sabores === true ? 'sanduiche' : i.sabores) : null;
+function renderGrade(){
+  const bt = (i) => `<button class="prod" data-vender="${i.id}"><b>${i.itens ? 'Combo ' : ''}${esc(i.nome)}</b><span>${brl(i.preco)}</span></button>`;
+  $('#grade').innerHTML = `<div class="sabor-sel">${Object.keys(SABORES).map(g => `<span><b>${esc(SABORES_NOME[g] || g)}:</b> ${SABORES[g].map(s => `<button class="chip" aria-pressed="${s===saborCaixa[g]}" data-sc="${esc(s)}" data-g="${g}">${esc(s)}</button>`).join('')}</span>`).join('<br>')}</div>
+    <h3>Doces</h3>${PRODUTOS.filter(p=>p.cat==='doces').map(bt).join('')}
+    <h3>Lanches</h3>${PRODUTOS.filter(p=>p.cat==='lanches').map(bt).join('')}
+    <h3>Cafés e bebidas</h3>${PRODUTOS.filter(p=>p.cat==='cafes').map(bt).join('')}
+    <h3>Combos</h3>${COMBOS.map(bt).join('')}`;
+}
+function renderCaixa(){
+  $('#caixa-linhas').innerHTML = caixa.length ? caixa.map((l, k) => { const i = Catalogo.info(l.id);
+    return `<div class="lin"><span>${i.itens ? 'Combo ' : ''}${esc(i.nome)}${l.sabor ? ` <small style="color:var(--suave)">(${esc(l.sabor)})</small>` : ''}</span>
+      <span class="mini"><button data-cx="${k}" data-d="-1">−</button><span>${l.q}</span><button data-cx="${k}" data-d="1">+</button></span><b>${brl(i.preco*l.q)}</b></div>`; }).join('')
+    : '<p style="color:var(--suave);font-size:14px">Toque nos produtos para lançar a venda.</p>';
+  const t = caixa.reduce((s,l) => s + Catalogo.info(l.id).preco * l.q, 0);
+  $('#v-total').textContent = brl(t); $('#v-registrar').disabled = !caixa.length;
+}
+$('#v-registrar').onclick = async () => {
+  const b = $('#v-registrar'); b.disabled = true; b.textContent = 'Registrando...';
+  try {
+    const itens = caixa.map(l => Catalogo.linha(l));
+    const reg = await api.registrar({canal:'balcao', mesa:null, nome:$('#v-nome').value.trim().slice(0,60), telefone:'', local:'', quando:'agora',
+      pagamento: document.querySelector('#v-pag [aria-pressed=true]').dataset.v, obs:'', itens, total: Catalogo.conferir(itens)});
+    caixa = []; $('#v-nome').value = ''; renderCaixa(); toast(`Venda ${reg.codigo} registrada`);
+  } catch(e) { toast('Não foi possível registrar. Verifique a internet.'); }
+  b.textContent = 'Registrar venda'; b.disabled = !caixa.length;
+};
+
+/* ================= resultado (DRE) ================= */
+function diasAbertosEntre(a, b){ let n = 0; for (let d = inicioDia(a); d <= b; d = new Date(+d + 864e5)) if (CONFIG.diasAbertos.includes(d.getDay())) n++; return n; }
+function renderResultado(){
+  const D = CONFIG.dre, agora = new Date();
+  const ini = periodo === 'hoje' ? inicioDia() : periodo === '7d' ? inicioDia(new Date(Date.now() - 6*864e5)) : new Date(agora.getFullYear(), agora.getMonth(), 1);
+  const v = todos.filter(p => p.criadoEm >= +ini && p.status !== 'cancelado');
+  const receita = v.reduce((s,p) => s + p.total, 0);
+  const fretes = v.reduce((s,p) => s + (p.frete || 0), 0);
+  const entregas = v.filter(p => p.canal === 'entrega').length;
+  const custoEntregas = entregas * ((CONFIG.delivery && CONFIG.delivery.custoPorEntrega) || 0);
+  const cmv = v.reduce((s,p) => s + p.itens.reduce((x,i) => x + (i.custo ?? Catalogo.custo(i.id)) * i.q, 0), 0);
+  const simples = receita * D.simples;
+  const taxas = v.reduce((s,p) => s + p.total * (D.taxas[p.pagamento] || 0), 0);
+  const perdas = (receita - fretes) * D.perdas;
+  const liquida = receita - simples - taxas;
+  const bruto = liquida - cmv - perdas - custoEntregas;
+  const fixoMes = D.custosFixos.reduce((s,c) => s + c.valor, 0);
+  const dias = periodo === 'hoje' ? (CONFIG.diasAbertos.includes(agora.getDay()) ? 1 : 0) : diasAbertosEntre(ini, agora);
+  const fixo = fixoMes * dias / D.diasAbertosNoMes;
+  const lucro = bruto - fixo;
+  const reserva = lucro > 0 ? lucro * D.reserva : 0;
+  const div = lucro > 0 ? (lucro - reserva) / D.socios.length : 0;
+  const ped = v.length, ticket = ped ? receita / ped : 0;
+
+  $('#kpis').innerHTML = `
+    <div class="kpi"><span>Faturamento</span><b>${brl(receita)}</b><small>${ped} pedidos</small></div>
+    <div class="kpi"><span>Ticket médio</span><b>${brl(ticket)}</b><small>por pedido</small></div>
+    <div class="kpi"><span>Margem dos produtos</span><b>${pct(receita ? (receita - cmv)/receita : NaN)}</b><small>CMV de ${brl(cmv)}</small></div>
+    <div class="kpi destaque ${lucro < 0 ? 'neg' : ''}"><span>Lucro operacional</span><b>${brl(lucro)}</b><small>depois dos custos fixos</small></div>`;
+
+  const L = (n, val, cls = '') => `<tr class="${cls}"><td>${n}</td><td>${brl(val)}</td><td>${receita ? pct(Math.abs(val)/receita) : ''}</td></tr>`;
+  $('#dre').innerHTML =
+    L('Receita bruta de vendas', receita, 'sub') +
+    (fretes ? L(`dos quais, taxas de entrega (${entregas} entregas)`, fretes, 'menos') : '') +
+    L('(−) Simples Nacional', -simples, 'menos') +
+    L('(−) Taxas de cartão', -taxas, 'menos') +
+    L('Receita líquida', liquida, 'sub') +
+    L('(−) Custo dos produtos (CMV)', -cmv, 'menos') +
+    L('(−) Perdas estimadas', -perdas, 'menos') +
+    (custoEntregas ? L('(−) Custo das entregas (motoboy)', -custoEntregas, 'menos') : '') +
+    L('Lucro bruto', bruto, 'sub') +
+    D.custosFixos.map(c => L('(−) ' + c.nome, -(c.valor * dias / D.diasAbertosNoMes), 'menos')).join('') +
+    L('Lucro operacional', lucro, 'fim' + (lucro < 0 ? ' neg' : '')) +
+    (lucro > 0 ? L(`(−) Reserva no caixa (${pct(D.reserva)})`, -reserva, 'menos') + D.socios.map(s => L('Dividendo · ' + s, div, 'menos')).join('') : '');
+  $('#nota-dre').textContent = `Custos fixos proporcionais a ${dias} dia(s) de funcionamento (de ${D.diasAbertosNoMes} no mês). CMV pelo custo de cada produto no cardápio. Simples, taxas e perdas são estimativas: confira com o contador.`;
+
+  // equilíbrio
+  const margemContrib = receita ? (bruto / receita) : 1 - D.simples - D.perdas - 0.3;
+  const eqDia = (fixoMes / D.diasAbertosNoMes) / Math.max(margemContrib, 0.05);
+  const meta = eqDia * Math.max(dias, 1);
+  const prog = meta ? Math.min(receita / meta, 1) : 0;
+  $('#eq-titulo').textContent = periodo === 'hoje' ? 'Equilíbrio de hoje' : 'Equilíbrio do período';
+  $('#eq').innerHTML = `<div class="barra-eq"><div style="width:${(prog*100).toFixed(1)}%"></div></div>
+    <p style="font-size:14px">${brl(receita)} de ${brl(meta)} <span style="color:var(--suave)">(${pct(receita/meta)})</span></p>
+    <p class="nota">${receita >= meta ? 'Custos do período pagos. Daqui em diante é lucro.' : `Faltam ${brl(meta - receita)} para pagar os custos do período, cerca de ${Math.ceil((meta - receita)/(ticket || 17))} pedidos.`}</p>`;
+
+  // por hora
+  const hs = []; for (let h = CONFIG.abre; h < CONFIG.fecha; h++) hs.push(h);
+  const porHora = hs.map(h => v.filter(p => new Date(p.criadoEm).getHours() === h).reduce((s,p)=>s+p.total,0));
+  const mx = Math.max(...porHora, 1);
+  $('#horas').innerHTML = hs.map((h,k) => `<div title="${h}h: ${brl(porHora[k])}">${porHora[k] ? `<em>${Math.round(porHora[k])}</em>` : ''}<i style="height:${(porHora[k]/mx*100).toFixed(1)}%"></i><small>${h}h</small></div>`).join('');
+
+  // ranking
+  const prods = {};
+  v.forEach(p => p.itens.forEach(i => { const k = i.nome; prods[k] = prods[k] || {q:0, r:0}; prods[k].q += i.q; prods[k].r += i.preco * i.q; }));
+  const top = Object.entries(prods).sort((a,b) => b[1].r - a[1].r).slice(0, 7);
+  const mr = top.length ? top[0][1].r : 1;
+  $('#rank').innerHTML = top.map(([n,x]) => `<div><span>${esc(n)} <small style="color:var(--suave)">· ${x.q} un.</small></span><b>${brl(x.r)}</b><i><u style="width:${(x.r/mr*100).toFixed(1)}%"></u></i></div>`).join('') || '<p class="nota">Sem vendas no período.</p>';
+
+  const soma = (fn) => { const o = {}; v.forEach(p => { const k = fn(p); o[k] = (o[k]||0) + p.total; }); return Object.entries(o).sort((a,b)=>b[1]-a[1]); };
+  const linhas = [...soma(p => ROTULO[p.canal] || p.canal), ...soma(p => p.pagamento)];
+  $('#canais').innerHTML = linhas.map(([n,x]) => `<div><span>${esc(n)}</span><b>${brl(x)} <small style="color:var(--suave);font-weight:600">${pct(receita ? x/receita : 0)}</small></b><i><u style="width:${receita ? (x/receita*100).toFixed(1) : 0}%"></u></i></div>`).join('') || '<p class="nota">Sem vendas no período.</p>';
+}
+
+/* ================= navegação e cliques ================= */
+function render(){ if (vista === 'pedidos') renderPedidos(); if (vista === 'resultado') renderResultado(); }
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.vista){
+    vista = t.dataset.vista;
+    document.querySelectorAll('[data-vista]').forEach(b => b.setAttribute('aria-selected', b === t));
+    ['pedidos','venda','resultado'].forEach(v => $('#v-' + v).classList.toggle('esconde', v !== vista));
+    if (vista === 'venda') { renderGrade(); renderCaixa(); }
+    render(); return;
+  }
+  if (t.dataset.f){ filtro = t.dataset.f; document.querySelectorAll('[data-f]').forEach(b => b.setAttribute('aria-pressed', b === t)); renderPedidos(); return; }
+  if (t.dataset.col){ colMovel = t.dataset.col; renderPedidos(); return; }
+  if (t.dataset.p){ periodo = t.dataset.p; document.querySelectorAll('[data-p]').forEach(b => b.setAttribute('aria-pressed', b === t)); renderResultado(); return; }
+  if (t.dataset.st){ t.disabled = true; try { await api.mudarStatus(t.dataset.id, t.dataset.st); } catch(err) { toast('Não foi possível atualizar. Verifique a internet.'); t.disabled = false; } return; }
+  if (t.dataset.cancelar){
+    if (!t.classList.contains('confirma')) { t.classList.add('confirma'); t.textContent = 'Confirmar cancelamento'; setTimeout(() => { t.classList.remove('confirma'); t.textContent = 'Cancelar'; }, 4000); return; }
+    try { await api.mudarStatus(t.dataset.cancelar, 'cancelado'); toast('Pedido cancelado'); } catch(err) { toast('Não foi possível cancelar.'); } return;
+  }
+  if (t.dataset.vender){ const i = Catalogo.info(t.dataset.vender); const sabor = grupoDe(i) ? saborCaixa[grupoDe(i)] : null;
+    const l = caixa.find(x => x.id === i.id && x.sabor === sabor); if (l) l.q++; else caixa.push({id:i.id, sabor, q:1}); renderCaixa(); return; }
+  if (t.dataset.sc){ saborCaixa[t.dataset.g] = t.dataset.sc; document.querySelectorAll(`[data-g="${t.dataset.g}"]`).forEach(b => b.setAttribute('aria-pressed', b === t)); return; }
+  if (t.dataset.cx !== undefined){ const l = caixa[+t.dataset.cx]; l.q += +t.dataset.d; if (l.q <= 0) caixa.splice(+t.dataset.cx, 1); renderCaixa(); return; }
+  if (t.closest('#v-pag')){ document.querySelectorAll('#v-pag button').forEach(b => b.setAttribute('aria-pressed', b === t)); return; }
+});
+
+/* ================= entrada ================= */
+$('#btn-abrir').onclick = async () => {
+  $('#capa-abrir').classList.add('esconde');
+  try { audio = new (window.AudioContext || window.webkitAudioContext)(); await audio.resume(); } catch(e) {}
+  try { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); } catch(e) {}
+  telaAcesa();
+  iniciar();
+};
+$('#form-login').onsubmit = async (e) => {
+  e.preventDefault();
+  const er = $('#l-erro'); er.classList.add('esconde');
+  try { await api.entrar($('#l-email').value.trim(), $('#l-senha').value); }
+  catch(err) { er.textContent = 'E-mail ou senha incorretos.'; er.classList.remove('esconde'); }
+};
+(async () => {
+  api = await Pedidos.pronto(true);
+  if (api.modo === 'demo') $('#aviso-demo').classList.remove('esconde');
+  let iniciado = false;
+  api.onAuth(u => {
+    if (!u) { $('#capa-login').classList.remove('esconde'); return; }
+    $('#capa-login').classList.add('esconde');
+    const socios = CONFIG.emailsSocios || [];
+    $('#aba-resultado').classList.toggle('esconde', !!(socios.length && !(u.email && socios.includes(u.email))));
+    if (!iniciado) { iniciado = true; $('#capa-abrir').classList.remove('esconde'); }
+  });
+})();
+</script>
+</body>
+</html>

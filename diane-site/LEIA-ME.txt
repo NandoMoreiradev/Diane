@@ -1,0 +1,81 @@
+DIANÊ: SITE DE PEDIDOS E PAINEL DO BALCÃO
+==========================================
+
+Este é um site estático: HTML, CSS e JavaScript puros, sem build e sem servidor próprio.
+O banco de dados é o Firebase Firestore. Para colocar no ar, basta hospedar esta pasta
+como está (Firebase Hosting, Netlify, Vercel ou outro host estático, sempre com HTTPS).
+
+
+ARQUIVOS
+--------
+index.html       Site do cliente: cardápio, sacola, retirada ou entrega (taxa calculada pelo CEP).
+                 Depois de enviar o pedido, o cliente acompanha o status na mesma tela.
+balcao.html      Painel da equipe. Exige login com e-mail e senha.
+                 Mostra os pedidos em colunas Novos, Em preparo e Prontos, com som e notificação.
+                 Tem a opção "Venda no balcão" e a aba "Resultado" (DRE em tempo real).
+mesas.html       Placas com QR Code para imprimir. Hoje a lista de mesas está vazia,
+                 então só sai a placa de pedido para retirada ou entrega.
+cardapio.js      CONFIGURAÇÃO: WhatsApp, horário, zonas de entrega, DRE, Firebase,
+                 produtos, preços e custos. É o único arquivo a editar no dia a dia.
+pedidos.js       Camada de dados (Firestore). Não precisa mexer.
+firestore.rules  Regras de segurança do banco. Cole no Firebase.
+midia/           Fotos (JPG) e logos (SVG).
+
+
+PASSO A PASSO PARA PUBLICAR
+---------------------------
+1. Criar um projeto em https://console.firebase.google.com
+   a) Firestore Database: criar em modo produção (região sugerida: southamerica-east1).
+   b) Authentication > Método de login: ativar "E-mail/senha".
+      Depois, em Usuários, criar as contas da equipe. Não existe tela de cadastro no site.
+   c) Firestore > Regras: colar o conteúdo de firestore.rules e publicar.
+   d) Configurações do projeto > Seus apps > Web: registrar um app e copiar o objeto
+      firebaseConfig.
+
+2. Em cardapio.js, preencher:
+   firebase:     o objeto copiado no passo 1d, por exemplo
+                 { apiKey: '...', authDomain: '...', projectId: '...', appId: '...' }
+                 Com firebase: null, o sistema roda em MODO DEMONSTRAÇÃO: os pedidos ficam só
+                 no navegador e não servem para a loja.
+   whatsapp:     número com DDI e DDD, só dígitos, por exemplo '5579900000000'.
+   urlSite:      endereço final do site, por exemplo 'https://diane.com.br'.
+                 Sem ele, os QR Codes das placas apontam para o endereço atual.
+   emailsSocios: e-mails que podem ver a aba Resultado. Vazio = todos da equipe veem.
+
+3. Hospedar a pasta inteira, com HTTPS (as notificações e a tela acesa do painel exigem HTTPS).
+   - Firebase Hosting: "firebase init hosting", com esta pasta como public
+     e sem reescrever para SPA. Depois, "firebase deploy".
+   - Netlify: arrastar a pasta para app.netlify.com/drop.
+   Se usar domínio próprio, adicione esse domínio em
+   Authentication > Configurações > Domínios autorizados.
+
+4. Testar:
+   - Fazer um pedido pelo index.html no celular.
+   - Conferir se ele chega ao balcao.html aberto em outro aparelho.
+   - Mudar o status do pedido e ver a atualização na tela do cliente.
+
+5. Abrir mesas.html e imprimir as placas com o QR Code. Faça isso só depois de preencher urlSite.
+
+
+SERVIÇOS EXTERNOS USADOS (sem chave)
+------------------------------------
+- Firebase JS SDK 10.12.2 (compat), carregado de www.gstatic.com
+- ViaCEP (viacep.com.br): encontra o bairro pelo CEP para calcular a taxa de entrega
+- Google Fonts: Fraunces e Jost
+- qrcode-generator 1.4.4 (cdnjs), usado só em mesas.html
+- wa.me: links para o WhatsApp
+
+
+COLEÇÃO DO BANCO
+----------------
+pedidos/{id}: campos validados em firestore.rules.
+- O cliente sem login só pode criar um pedido novo e ler o próprio pedido pelo id.
+- A equipe logada lista os pedidos, muda o status e lança vendas do balcão.
+- Nada pode ser apagado.
+
+
+PENDENTE COM A DONA
+-------------------
+- Número do WhatsApp.
+- Confirmar preços, custos e sabores no cardapio.js.
+- Revisar a lista de bairros e taxas de entrega (CONFIG.delivery).

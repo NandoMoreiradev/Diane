@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dianê · QR Codes</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="midia/diane-simbolo-caramelo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,600..900,0..100,0..1&family=Jost:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{--torra:#3D2116;--caramelo:#A4560D;--leite:#FFE7D0;--areia:#F2CDB0;--suave:#6F4F3D}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Jost,Arial,sans-serif;background:#E9E1D6;color:var(--torra);padding:24px 16px}
+.barra{max-width:900px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.barra h1{font-size:22px;font-weight:800}
+.barra p{font-size:13.5px;color:var(--suave);max-width:560px}
+.barra button{background:var(--caramelo);color:#fff;border:0;border-radius:999px;padding:12px 20px;font:700 14px Jost,sans-serif;cursor:pointer}
+.folha{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.folha{grid-template-columns:1fr}}
+.placa{background:var(--leite);border-radius:22px;padding:26px 22px;display:grid;justify-items:center;text-align:center;gap:10px;break-inside:avoid;aspect-ratio:10/14}
+.placa.escura{background:var(--torra);color:#fff}
+.placa img.logo{width:170px}
+.placa h2{font-family:Fraunces,Georgia,serif;font-size:26px;font-weight:800;line-height:1.1}
+.placa .sub{font-size:14px;color:var(--suave);font-weight:600}
+.placa.escura .sub{color:var(--areia)}
+.qr{background:#fff;padding:12px;border-radius:16px;width:62%;aspect-ratio:1}
+.qr svg{width:100%;height:100%;display:block}
+.mesa{font-size:13px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--caramelo)}
+.placa.escura .mesa{color:#E39A8C}
+.slogan{font-style:italic;font-size:12.5px;color:var(--suave)}
+.placa.escura .slogan,.placa.escura .url{color:var(--areia)}
+.url{font-size:10.5px;color:var(--suave);word-break:break-all}
+@media print{
+  body{background:#fff;padding:0}
+  .barra{display:none}
+  .folha{gap:8mm;max-width:none}
+  .placa{border:1px dashed #ccc}
+  @page{size:A4;margin:10mm}
+}
+</style>
+</head>
+<body>
+<div class="barra">
+  <div>
+    <h1>QR Codes da Dianê</h1>
+    <p id="dica">Placas para o balcão, a vitrine e a sacola: o cliente aponta a câmera e pede pelo site. Imprima em papel firme (A4, sem margens extras) e use em displays de acrílico.</p>
+  </div>
+  <button onclick="print()">Imprimir</button>
+</div>
+<div class="folha" id="folha"></div>
+
+<script src="cardapio.js"></script>
+<script>
+const base = (CONFIG.urlSite || (location.origin + location.pathname.replace(/[^/]*$/, ''))).replace(/\/?$/, '/');
+function qr(url){
+  const q = qrcode(0, 'M'); q.addData(url); q.make();
+  return q.createSvgTag({cellSize: 6, margin: 0, scalable: true});
+}
+const placas = CONFIG.mesas.map(m => ({url: `${base}?mesa=${m.n}`, mesa: `Mesa ${m.n} · ${m.nome}`, titulo: 'Peça daqui da mesa', sub: 'Aponte a câmera, escolha e envie. Levamos até você.', escura: m.n % 2 === 0}));
+placas.push({url: base, mesa: 'Pedido para levar', titulo: 'Peça antes de chegar', sub: 'Retire no balcão sem fila ou receba no trabalho ou em casa.', escura: true});
+placas.push({url: base + '#empresas', mesa: 'Reuniões e eventos', titulo: 'O café da sua reunião', sub: 'Combos para 6, 10 ou 20 pessoas, coffee breaks e encomendas.', escura: false});
+document.getElementById('folha').innerHTML = placas.map(p => `
+  <section class="placa ${p.escura ? 'escura' : ''}">
+    <img class="logo" src="midia/${p.escura ? 'diane-logo-creme.svg' : 'diane-logo-caramelo.svg'}" alt="Dianê">
+    <span class="mesa">${p.mesa}</span>
+    <h2>${p.titulo}</h2>
+    <div class="qr">${qr(p.url)}</div>
+    <p class="sub">${p.sub}</p>
+    <p class="slogan">O sabor que faltava no seu dia</p>
+    <p class="url">${p.url}</p>
+  </section>`).join('');
+if (!CONFIG.urlSite) document.getElementById('dica').textContent += ' Atenção: os QR Codes apontam para o endereço atual. Antes de imprimir, coloque o endereço público do site em urlSite, no cardapio.js.';
+</script>
+</body>
+</html>

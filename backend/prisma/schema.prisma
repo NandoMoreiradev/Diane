@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SOCIA
+  BALCAO
+}
+
+enum OrderChannel {
+  mesa
+  retirada
+  entrega
+  balcao
+}
+
+enum OrderStatus {
+  novo
+  preparo
+  pronto
+  entregue
+  cancelado
+}
+
+model RoleDefinition {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  nome        String
+  descricao   String   @default("")
+  permissions String[]
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id                 String          @id @default(cuid())
+  email              String          @unique
+  name               String
+  passwordHash       String
+  role               Role            @default(BALCAO)
+  roleId             String?
+  roleRef            RoleDefinition? @relation(fields: [roleId], references: [id])
+  directPermissions  String[]        @default([])
+  active             Boolean         @default(true)
+  sessionsValidAfter DateTime?
+  refreshTokens      RefreshToken[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  familyId  String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model StoreConfig {
+  id               String   @id @default("default")
+  whatsapp         String   @default("")
+  abre             Int      @default(7)
+  fecha            Int      @default(17)
+  diasAbertos      Int[]    @default([1, 2, 3, 4, 5, 6])
+  entrega          Boolean  @default(true)
+  pedidoMinimo     Float    @default(25)
+  freteGratisAcima Float    @default(80)
+  custoPorEntrega  Float    @default(0)
+  urlSite          String   @default("")
+  mesas            Json     @default("[]")
+  dre              Json
+  updatedAt        DateTime @updatedAt
+}
+
+model DeliveryZone {
+  id      String   @id
+  nome    String
+  ate     String
+  taxa    Float
+  prazo   String
+  bairros String[]
+  ordem   Int      @default(0)
+}
+
+model FlavorGroup {
+  slug     String    @id
+  nome     String
+  sabores  String[]
+  products Product[]
+  combos   Combo[]
+}
+
+model Product {
+  id          String       @id
+  cat         String
+  nome        String
+  desc        String
+  preco       Float
+  custo       Float
+  arte        String
+  saboresSlug String?
+  flavorGroup FlavorGroup? @relation(fields: [saboresSlug], references: [slug])
+  tag         String?
+  soNaMesa    Boolean      @default(false)
+  ativo       Boolean      @default(true)
+  ordem       Int          @default(0)
+}
+
+model Combo {
+  id          String       @id
+  nome        String
+  desc        String
+  itens       String[]
+  arte        String[]     @default([])
+  preco       Float
+  selo        String?
+  saboresSlug String?
+  flavorGroup FlavorGroup? @relation(fields: [saboresSlug], references: [slug])
+  pessoas     Int          @default(1)
+  onde        String[]     @default(["delivery"])
+  ativo       Boolean      @default(true)
+  ordem       Int          @default(0)
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  codigo      String
+  canal       OrderChannel
+  mesa        Int?
+  nome        String       @default("")
+  telefone    String       @default("")
+  local       String       @default("")
+  bairro      String       @default("")
+  quando      String       @default("agora")
+  pagamento   String
+  obs         String       @default("")
+  subtotal    Float
+  frete       Float        @default(0)
+  total       Float
+  status      OrderStatus  @default(novo)
+  criadoEm    DateTime     @default(now())
+  emPreparo   DateTime?
+  emPronto    DateTime?
+  emEntregue  DateTime?
+  emCancelado DateTime?
+  itens       OrderItem[]
+
+  @@index([criadoEm])
+  @@index([status])
+}
+
+model OrderItem {
+  id      String  @id @default(cuid())
+  orderId String
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemId  String
+  nome    String
+  q       Int
+  preco   Float
+  custo   Float
+  sabor   String?
+}
