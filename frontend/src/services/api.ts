@@ -4,6 +4,7 @@ import {
   CatalogData,
   Combo,
   DeliveryZone,
+  DreData,
   Order,
   OrderStatus,
   PermissionCatalogItem,
@@ -96,8 +97,10 @@ async function request<T>(path: string, init: RequestInit = {}, auth = false, re
 export const api = {
   getCatalog: () => request<CatalogData>('/catalog'),
 
+  getDre: () => request<DreData>('/catalog/dre', {}, true),
+
   getAdminCatalog: () =>
-    request<{ config: Record<string, unknown>; products: Array<Product & { ativo: boolean }>; combos: Combo[] }>(
+    request<{ config: Record<string, unknown>; products: Array<Product & { ativo: boolean; custo: number }>; combos: Combo[] }>(
       '/catalog/admin',
       {},
       true,
@@ -257,13 +260,4 @@ export function findCatalogItem(catalog: CatalogData, id: string): Product | Com
 
 export function isCombo(item: Product | Combo): item is Combo {
   return 'itens' in item;
-}
-
-export function itemCost(catalog: CatalogData, id: string): number {
-  const item = findCatalogItem(catalog, id);
-  if (!item) return 0;
-  if (isCombo(item)) {
-    return item.itens.reduce((sum, pid) => sum + (catalog.produtos.find((p) => p.id === pid)?.custo ?? 0), 0);
-  }
-  return item.custo ?? 0;
 }

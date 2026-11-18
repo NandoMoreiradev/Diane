@@ -34,7 +34,6 @@ export class CatalogService {
         delivery: {
           pedidoMinimo: config.pedidoMinimo,
           freteGratisAcima: config.freteGratisAcima,
-          custoPorEntrega: config.custoPorEntrega,
           zonas: zones.map((z) => ({
             id: z.id,
             nome: z.nome,
@@ -46,7 +45,6 @@ export class CatalogService {
         },
         urlSite: config.urlSite,
         mesas: config.mesas as Array<{ n: number; nome: string }>,
-        dre: config.dre,
       },
       sabores: Object.fromEntries(flavorGroups.map((g) => [g.slug, g.sabores])),
       saboresNome: Object.fromEntries(flavorGroups.map((g) => [g.slug, g.nome])),
@@ -56,7 +54,6 @@ export class CatalogService {
         nome: p.nome,
         desc: p.desc,
         preco: p.preco,
-        custo: p.custo,
         arte: p.arte,
         sabores: p.saboresSlug,
         tag: p.tag,
@@ -77,13 +74,31 @@ export class CatalogService {
     };
   }
 
+  /** Dados financeiros sensíveis: somente para quem tem `dre:read`. */
+  async getDreData() {
+    const [config, products, combos] = await Promise.all([
+      this.prisma.storeConfig.findUnique({ where: { id: 'default' } }),
+      this.prisma.product.findMany({ select: { id: true, custo: true } }),
+      this.prisma.combo.findMany({ select: { id: true, itens: true } }),
+    ]);
+    if (!config) throw new NotFoundException('Configuração da loja não encontrada.');
+    const custos: Record<string, number> = Object.fromEntries(products.map((p) => [p.id, p.custo]));
+    const productCost = new Map(products.map((p) => [p.id, p.custo]));
+    for (const c of combos) {
+      custos[c.id] = Number(c.itens.reduce((sum, pid) => sum + (productCost.get(pid) ?? 0), 0).toFixed(2));
+    }
+    return { dre: config.dre, custoPorEntrega: config.custoPorEntrega, custos };
+  }
+
   async getAdminCatalog() {
     const [config, products, combos] = await Promise.all([
       this.prisma.storeConfig.findUnique({ where: { id: 'default' } }),
       this.prisma.product.findMany({ orderBy: { ordem: 'asc' } }),
       this.prisma.combo.findMany({ orderBy: { ordem: 'asc' } }),
     ]);
-    return { config, products, combos };
+    // O DRE só é entregue por /catalog/dre (permissão `dre:read`).
+    const { dre: _dre, ...configWithoutDre } = config ?? ({} as NonNullable<typeof config>);
+    return { config: config ? configWithoutDre : null, products, combos };
   }
 
   async updateProduct(id: string, data: { preco?: number; custo?: number; ativo?: boolean }) {

@@ -2,16 +2,19 @@
   "name": "diane-backend",
   "version": "1.0.0",
   "private": true,
+  "engines": { "node": ">=20" },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/src/main",
+    "start:prod:railway": "prisma migrate deploy && node dist/prisma/bootstrap.js && node dist/src/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:bootstrap": "tsx prisma/bootstrap.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",

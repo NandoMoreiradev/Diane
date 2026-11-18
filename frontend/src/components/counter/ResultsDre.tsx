@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { brl, itemCost, pct } from '../../services/api';
-import { CatalogData, Order } from '../../types/diane';
+import { api, brl, pct } from '../../services/api';
+import { CatalogData, DreData, Order } from '../../types/diane';
 import { Chip, FiltersRow } from './CounterStyles';
 
 const KpisGrid = styled.div`
@@ -125,11 +125,11 @@ interface Props {
   orders: Order[];
 }
 
-export const ResultsDre: React.FC<Props> = ({ catalog, orders }) => {
+const DreView: React.FC<Props & { fin: DreData }> = ({ catalog, orders, fin }) => {
   const [periodo, setPeriodo] = useState<'hoje' | '7d' | 'mes'>('hoje');
 
   const data = useMemo(() => {
-    const D = catalog.config.dre;
+    const D = fin.dre;
     const agora = new Date();
     const ini =
       periodo === 'hoje'
@@ -142,9 +142,9 @@ export const ResultsDre: React.FC<Props> = ({ catalog, orders }) => {
     const receita = v.reduce((s, p) => s + p.total, 0);
     const fretes = v.reduce((s, p) => s + (p.frete || 0), 0);
     const entregas = v.filter((p) => p.canal === 'entrega').length;
-    const custoEntregas = entregas * (catalog.config.delivery.custoPorEntrega || 0);
+    const custoEntregas = entregas * (fin.custoPorEntrega || 0);
     const cmv = v.reduce(
-      (s, p) => s + p.itens.reduce((x, i) => x + (i.custo ?? itemCost(catalog, i.id)) * i.q, 0),
+      (s, p) => s + p.itens.reduce((x, i) => x + (i.custo ?? fin.custos[i.id] ?? 0) * i.q, 0),
       0,
     );
     const simples = receita * D.simples;
@@ -232,7 +232,7 @@ export const ResultsDre: React.FC<Props> = ({ catalog, orders }) => {
       mr,
       canais,
     };
-  }, [catalog, orders, periodo]);
+  }, [catalog, orders, periodo, fin]);
 
   const row = (label: string, val: number, cls = '') => (
     <tr key={label} className={cls}>
@@ -401,4 +401,24 @@ export const ResultsDre: React.FC<Props> = ({ catalog, orders }) => {
       </BlocksGrid>
     </section>
   );
+};
+
+export const ResultsDre: React.FC<Props> = ({ catalog, orders }) => {
+  const [fin, setFin] = useState<DreData | null>(null);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    let vivo = true;
+    api
+      .getDre()
+      .then((d) => vivo && setFin(d))
+      .catch((e: Error) => vivo && setErro(e.message));
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  if (erro) return <p role="alert">Não foi possível carregar o resultado: {erro}</p>;
+  if (!fin) return <p>Carregando resultado…</p>;
+  return <DreView catalog={catalog} orders={orders} fin={fin} />;
 };

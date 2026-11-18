@@ -11,7 +11,8 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
+import { ClientIpThrottlerGuard } from '../common/client-ip-throttler.guard';
 import { OrderStatus, Role } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PermissionsGuard, RequirePermission } from '../auth/guard/permissions.guard';
@@ -30,7 +31,7 @@ export class OrdersController {
   ) {}
 
   @Post()
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(ClientIpThrottlerGuard)
   @Throttle({ default: { limit: 15, ttl: 60000 } })
   createPublicOrder(@Body() dto: CreateOrderDto) {
     return this.ordersService.createPublicOrder(dto);

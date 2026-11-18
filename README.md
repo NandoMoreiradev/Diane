@@ -58,18 +58,26 @@ Aplicação full-stack da **Dianê** (Brigaderia & Café Takeaway — Aracaju/SE
    - QR Codes: `http://localhost:5173/qr-codes`
    - API: `http://localhost:3001/api`
 
-## Credenciais iniciais (seed)
+## Usuários de desenvolvimento
 
-> Troque as senhas antes de usar em produção.
+`npm run prisma:seed` cria usuários de **demonstração** (`socia@diane.com.br` e `balcao@diane.com.br`).
+As senhas vêm de `SEED_SOCIA_PASSWORD` / `SEED_BALCAO_PASSWORD` (ou padrões locais do código).
+O seed **recusa rodar em produção**.
 
-- **Sócia (acesso completo + aba Resultado/DRE):** `socia@diane.com.br` / `diane2026`
-- **Equipe Balcão (pedidos e venda no balcão):** `balcao@diane.com.br` / `balcao2026`
+## Deploy no Railway (um serviço Web + PostgreSQL)
 
-## Deploy no Railway
+O serviço Web builda o front e serve `/` e `/api` na mesma origem (sem CORS).
 
-1. Crie um projeto no Railway com um serviço **PostgreSQL** e um serviço **Web** conectado a este repositório.
-2. No serviço Web, configure as variáveis de ambiente:
-   - `DATABASE_URL`: referência da variável do PostgreSQL do Railway (`${{Postgres.DATABASE_URL}}`)
-   - `JWT_SECRET`: string aleatória longa e segura
-   - `NODE_ENV`: `production`
-3. O Railway usará automaticamente o [railway.json](railway.json) para rodar `npm run build` e `npm run start:prod` (que aplica `prisma migrate deploy` e sobe o servidor NestJS servindo a API `/api/*` e o frontend buildado em `frontend/dist`).
+1. Crie o projeto com um serviço **PostgreSQL** e um serviço **Web** ligado a este repositório.
+2. Variáveis do serviço Web:
+   - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`
+   - `NODE_ENV` = `production`
+   - `JWT_SECRET` = 64+ caracteres aleatórios (o app não sobe com menos de 32)
+   - `BOOTSTRAP_ADMIN_EMAIL` e `BOOTSTRAP_ADMIN_PASSWORD` (mín. 12 caracteres), só para o 1º deploy
+   - opcional: `CORS_ORIGIN`, `TRUST_PROXY_HOPS` (padrão 2: Cloudflare + Railway)
+3. No 1º deploy, o start roda `prisma migrate deploy` e o **bootstrap**, que cria cargos, cardápio
+   inicial e o administrador. É idempotente e nunca sobrescreve senhas, preços ou configurações.
+4. Depois do 1º login, **apague `BOOTSTRAP_ADMIN_PASSWORD`** e crie a equipe pela tela de usuários.
+5. Cloudflare: DNS com proxy ligado, SSL/TLS **Full (strict)**, "Always Use HTTPS" e uma regra de
+   rate-limit para `/api/auth/*`.
+6. Ative backups do PostgreSQL no Railway.

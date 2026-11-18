@@ -10,13 +10,15 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
+import { ClientIpThrottlerGuard } from '../common/client-ip-throttler.guard';
 import { IsString, MinLength } from 'class-validator';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthenticatedUser } from './guard/permissions.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { clientIp } from '../common/client-ip';
 import { LoginAttemptsService } from './login-attempts.service';
 
 class ChangePasswordDto {
@@ -46,7 +48,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(ClientIpThrottlerGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async login(
@@ -63,7 +65,7 @@ export class AuthController {
     }
 
     const result = await this.authService.login(dto.email, dto.password, {
-      ipAddress: req.ip,
+      ipAddress: clientIp(req),
       userAgent: req.headers['user-agent'],
     });
 
@@ -80,7 +82,7 @@ export class AuthController {
     const rawToken = req.cookies?.refresh_token as string | undefined;
     try {
       const result = await this.authService.refresh(rawToken, {
-        ipAddress: req.ip,
+        ipAddress: clientIp(req),
         userAgent: req.headers['user-agent'],
       });
       res.cookie('refresh_token', result.rawRefreshToken, REFRESH_COOKIE_OPTIONS);

@@ -30,12 +30,10 @@ export interface StoreConfig {
   delivery: {
     pedidoMinimo: number;
     freteGratisAcima: number;
-    custoPorEntrega: number;
     zonas: DeliveryZone[];
   };
   urlSite: string;
   mesas: Array<{ n: number; nome: string }>;
-  dre: DreConfig;
 }
 
 export interface Product {
@@ -44,7 +42,7 @@ export interface Product {
   nome: string;
   desc: string;
   preco: number;
-  custo: number;
+  custo?: number;
   arte: string;
   sabores?: string | null;
   tag?: string | null;
@@ -84,7 +82,7 @@ export interface OrderItem {
   nome: string;
   q: number;
   preco: number;
-  custo: number;
+  custo?: number;
   sabor: string | null;
 }
 
@@ -145,4 +143,10 @@ export interface AdminUser {
   directPermissions: string[];
   effectivePermissions: string[];
   active: boolean;
+}
+
+export interface DreData {
+  dre: DreConfig;
+  custoPorEntrega: number;
+  custos: Record<string, number>;
 }

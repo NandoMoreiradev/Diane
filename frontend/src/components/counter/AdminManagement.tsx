@@ -84,7 +84,7 @@ export const CatalogManagement: React.FC<{
   onToast: (msg: string) => void;
   onCatalogUpdated: () => void;
 }> = ({ canEditConfig, onToast, onCatalogUpdated }) => {
-  const [products, setProducts] = useState<Array<Product & { ativo: boolean }>>([]);
+  const [products, setProducts] = useState<Array<Product & { ativo: boolean; custo: number }>>([]);
   const [cfg, setCfg] = useState({
     whatsapp: '',
     urlSite: '',
@@ -124,7 +124,7 @@ export const CatalogManagement: React.FC<{
     }
   };
 
-  const handleToggleProduct = async (p: Product & { ativo: boolean }) => {
+  const handleToggleProduct = async (p: Product & { ativo: boolean; custo: number }) => {
     try {
       await api.updateProduct(p.id, { ativo: !p.ativo });
       setProducts((prev) => prev.map((x) => (x.id === p.id ? { ...x, ativo: !p.ativo } : x)));

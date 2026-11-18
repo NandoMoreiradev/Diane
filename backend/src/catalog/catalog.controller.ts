@@ -66,6 +66,13 @@ export class CatalogController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission('dre:read')
+  @Get('dre')
+  getDre() {
+    return this.catalogService.getDreData();
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @RequirePermission('catalog:manage')
   @Get('admin')
   getAdminCatalog() {

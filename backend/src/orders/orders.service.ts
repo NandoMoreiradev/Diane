@@ -204,7 +204,8 @@ export class OrdersService {
 
     const serialized = this.serialize(created);
     this.events.emit({ type: 'order.created', order: serialized });
-    return serialized;
+    // O cliente não recebe o custo dos itens (dado interno).
+    return { ...serialized, itens: serialized.itens.map(({ custo: _custo, ...item }) => item) };
   }
 
   async createCounterSale(dto: CreateOrderDto) {
