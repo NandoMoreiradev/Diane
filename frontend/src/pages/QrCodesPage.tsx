@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import styled from 'styled-components';
 import { api } from '../services/api';
+import { publicSiteOrigin } from '../services/hosts';
 import { CatalogData } from '../types/diane';
 
 const Page = styled.div`
@@ -101,7 +102,7 @@ export const QrCodesPage: React.FC = () => {
   useEffect(() => {
     api.getCatalog().then(async (cat) => {
       setCatalog(cat);
-      const base = (cat.config.urlSite || window.location.origin).replace(/\/?$/, '/');
+      const base = (cat.config.urlSite || publicSiteOrigin()).replace(/\/?$/, '/');
       const raw = [
         ...cat.config.mesas.map((m) => ({
           url: `${base}?mesa=${m.n}`,

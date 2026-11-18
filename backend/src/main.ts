@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
+import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
@@ -33,6 +34,16 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
+
+  // api.<domínio> serve somente a API: fora de /api não entrega o front-end.
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const host = (req.headers.host ?? '').toLowerCase();
+    if (host.startsWith('api.') && !req.path.startsWith('/api')) {
+      res.status(404).json({ statusCode: 404, message: 'Not Found' });
+      return;
+    }
+    next();
+  });
 
   app.setGlobalPrefix('api');
 
