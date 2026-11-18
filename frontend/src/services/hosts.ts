@@ -13,9 +13,10 @@ export function detectHostMode(hostname = window.location.hostname): HostMode {
   const h = hostname.toLowerCase();
   if (isLocal(h)) return 'all';
   if (h.startsWith('app.')) return 'app';
-  // Domínios provisórios (ex.: *.up.railway.app) mantêm tudo ativo para testes.
-  if (h.endsWith('.up.railway.app')) return 'all';
-  return 'site';
+  // Separação site/sistema só vale quando o domínio app. existe (VITE_SPLIT_HOSTS=true no build).
+  // Com um único domínio, o sistema fica em <domínio>/balcao.
+  if (import.meta.env.VITE_SPLIT_HOSTS === 'true' && !h.endsWith('.up.railway.app')) return 'site';
+  return 'all';
 }
 
 /** Origem do site público (remove o prefixo `app.` quando estamos no sistema). */
